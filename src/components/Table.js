@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
+import classNames from "classnames";
 
-import { getAge } from "../utils";
+import { getAge, sortCandidatesBy } from "../utils";
+import "./Table.scss";
+import { CANDIDATES_COLUMNS } from "../constants";
 
 const Table = ({ data }) => {
-  const rowNodes = Object.values(data).map((candidate) => {
+  const [candidates, setCandidates] = useState(data);
+
+  const rows = Object.values(candidates).map((candidate) => {
     const {
       id,
       name,
@@ -26,20 +31,36 @@ const Table = ({ data }) => {
       </tr>
     );
   });
+
+  const tableHeaders = Object.keys(CANDIDATES_COLUMNS).map((column) => {
+    const columnData = CANDIDATES_COLUMNS[column];
+    const thClassnames = classNames({
+      "table__theader--sortable": columnData.isSortable,
+    });
+	
+    return (
+      <th
+        key={column}
+        scope="col"
+        className={thClassnames}
+        onClick={() => handleSort(column)}
+      >
+        {columnData.display}
+      </th>
+    );
+  });
+
+  const handleSort = (sortColumn) => {
+    const sortedCandidates = sortCandidatesBy(data, sortColumn);
+    setCandidates(sortedCandidates);
+  };
+
   return (
     <table className="table table-striped">
       <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Email</th>
-          <th scope="col">Age</th>
-          <th scope="col">Years of experience</th>
-          <th scope="col">Position applied</th>
-          <th scope="col">Application date</th>
-          <th scope="col">Status</th>
-        </tr>
+        <tr>{tableHeaders}</tr>
       </thead>
-      <tbody>{rowNodes}</tbody>
+      <tbody>{rows}</tbody>
     </table>
   );
 };
