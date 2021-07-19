@@ -7,6 +7,7 @@ import {
   NUMBER_TYPE,
   STRING_TYPE,
   DATE_TYPE,
+  STATUS_COLUMN,
 } from "./constants";
 
 export const keysToCamel = function (o) {
@@ -89,6 +90,18 @@ export const sortCandidatesBy = (candidates, sortColumn) => {
     );
     return sortedCandidates;
   } else {
-	  return candidates;
+    return candidates;
   }
+};
+
+export const filterCandidates = (candidates, filters) => {
+  let filteredCandidates = [];
+  filters.forEach((filter) => {
+    if (filter.field === STATUS_COLUMN) {
+      filteredCandidates = candidates.filter(
+        (candidate) => candidate.status === filter.value
+      );
+    }
+  });
+  return filteredCandidates;
 };

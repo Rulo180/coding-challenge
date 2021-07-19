@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 
-import { getAge, sortCandidatesBy } from "../utils";
+import { getAge } from "../utils";
 import "./Table.scss";
 import { CANDIDATES_COLUMNS } from "../constants";
 
-const Table = ({ data }) => {
-  const [candidates, setCandidates] = useState(data);
-
-  const rows = Object.values(candidates).map((candidate) => {
+const Table = ({ data, onSort }) => {
+  const rows = Object.values(data).map((candidate) => {
     const {
       id,
       name,
@@ -37,23 +35,22 @@ const Table = ({ data }) => {
     const thClassnames = classNames({
       "table__theader--sortable": columnData.isSortable,
     });
-	
+
     return (
       <th
         key={column}
         scope="col"
         className={thClassnames}
-        onClick={() => handleSort(column)}
+        onClick={() => {
+          if (onSort) {
+            onSort(column);
+          }
+        }}
       >
         {columnData.display}
       </th>
     );
   });
-
-  const handleSort = (sortColumn) => {
-    const sortedCandidates = sortCandidatesBy(data, sortColumn);
-    setCandidates(sortedCandidates);
-  };
 
   return (
     <table className="table table-striped">

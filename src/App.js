@@ -4,12 +4,17 @@ import "bootstrap/dist/css/bootstrap.css";
 
 import Table from "./components/Table";
 import "./App.scss";
-import { parseResponse } from "./utils";
+import { parseResponse, sortCandidatesBy, filterCandidates } from "./utils";
+import { STATUS_OPTIONS } from "./constants";
 
 const App = () => {
   const [candidates, setCandidates] = useState([]);
+  const [filteredCandidates, setFilteredCandidates] = useState([]);
+  const [filters, setFilters] = useState([]);
+  const [sortColumn, setSortColumn] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+
   useEffect(() => {
     fetch("https://personio-fe-test.herokuapp.com/api/v1/candidates", {
       method: "GET",
@@ -19,14 +24,24 @@ const App = () => {
     })
       .then((response) => response.json())
       .then((response) => {
-        setCandidates(parseResponse(response.data));
+        const parsedResponse = parseResponse(response.data);
+        setCandidates(parsedResponse);
+        setFilteredCandidates(parsedResponse);
         setIsLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        console.log("Error: ", err)
         setIsError(true);
       });
   }, []);
+
+  useEffect(() => {
+    let filteredCandidates = filterCandidates(candidates, filters);
+    if (sortColumn) {
+      filteredCandidates = sortCandidatesBy(filteredCandidates, sortColumn);
+    }
+    setFilteredCandidates(filteredCandidates);
+  }, [filters]);
 
   if (isError) {
     return (
@@ -36,6 +51,31 @@ const App = () => {
     );
   }
 
+  const handleSort = (sortColumn) => {
+    const sortedCandidates = sortCandidatesBy(filteredCandidates, sortColumn);
+    setFilteredCandidates(sortedCandidates);
+    setSortColumn(sortColumn);
+  };
+
+  const handleSelect = (e) => {
+    setFilters([{ field: "status", value: e.target.value }]);
+  };
+
+  const statusFilter = (
+    <select
+      id="inputStatus"
+      defaultValue=""
+      className="form-select"
+      onChange={handleSelect}
+    >
+      {STATUS_OPTIONS.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  );
+
   return (
     <div className="container-fluid">
       <div className="row">
@@ -43,12 +83,20 @@ const App = () => {
           <h1>Applications</h1>
         </div>
       </div>
+      <div className="row">
+        <div className="col col-4">
+          <label htmlFor="inputStatus" className="form-label">
+            Status
+          </label>
+          {statusFilter}
+        </div>
+      </div>
       {isLoading ? (
         <div className="spinner-border" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
       ) : (
-        <Table data={candidates} />
+        <Table data={filteredCandidates} onSort={handleSort} />
       )}
     </div>
   );
