@@ -8,6 +8,7 @@ import {
   STRING_TYPE,
   DATE_TYPE,
   STATUS_COLUMN,
+  NAME_COLUMN,
 } from "./constants";
 
 export const keysToCamel = function (o) {
@@ -95,12 +96,23 @@ export const sortCandidatesBy = (candidates, sortColumn) => {
 };
 
 export const filterCandidates = (candidates, filters) => {
-  let filteredCandidates = [];
+  let filteredCandidates = candidates;
   filters.forEach((filter) => {
-    if (filter.field === STATUS_COLUMN) {
-      filteredCandidates = candidates.filter(
-        (candidate) => candidate.status === filter.value
-      );
+    if (filter.value) {
+      if (filter.field === STATUS_COLUMN) {
+        filteredCandidates = filteredCandidates.filter(
+          (candidate) => candidate.status === filter.value
+        );
+      } else if (filter.field === NAME_COLUMN) {
+        filteredCandidates = filteredCandidates.filter((candidate) => {
+          const matchingParts = candidate.name
+            .split(" ")
+            .filter((namePart) =>
+              namePart.toLowerCase().startsWith(filter.value.toLowerCase())
+            );
+          return matchingParts.length > 0;
+        });
+      }
     }
   });
   return filteredCandidates;

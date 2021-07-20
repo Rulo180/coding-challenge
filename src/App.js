@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import Table from "./components/Table";
 import "./App.scss";
 import { parseResponse, sortCandidatesBy, filterCandidates } from "./utils";
-import { STATUS_OPTIONS } from "./constants";
+import FilterSection from "./components/FilterSection";
 
 const App = () => {
   const [candidates, setCandidates] = useState([]);
@@ -30,7 +30,7 @@ const App = () => {
         setIsLoading(false);
       })
       .catch((err) => {
-        console.log("Error: ", err)
+        console.log("Error: ", err);
         setIsError(true);
       });
   }, []);
@@ -57,25 +57,6 @@ const App = () => {
     setSortColumn(sortColumn);
   };
 
-  const handleSelect = (e) => {
-    setFilters([{ field: "status", value: e.target.value }]);
-  };
-
-  const statusFilter = (
-    <select
-      id="inputStatus"
-      defaultValue=""
-      className="form-select"
-      onChange={handleSelect}
-    >
-      {STATUS_OPTIONS.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-  );
-
   return (
     <div className="container-fluid">
       <div className="row">
@@ -83,14 +64,7 @@ const App = () => {
           <h1>Applications</h1>
         </div>
       </div>
-      <div className="row">
-        <div className="col col-4">
-          <label htmlFor="inputStatus" className="form-label">
-            Status
-          </label>
-          {statusFilter}
-        </div>
-      </div>
+      <FilterSection onSubmit={setFilters} />
       {isLoading ? (
         <div className="spinner-border" role="status">
           <span className="visually-hidden">Loading...</span>
