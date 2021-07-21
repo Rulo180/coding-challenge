@@ -117,3 +117,14 @@ export const filterCandidates = (candidates, filters) => {
   });
   return filteredCandidates;
 };
+
+export const setQueryString = (queryParams) => {
+  const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${queryParams}`;
+
+  window.history.pushState({ path: newUrl }, "", newUrl);
+};
+
+export const parseQueryStringObject = (queryObj) =>
+  Object.keys(queryObj).map((queryParam) => {
+    return { field: queryParam, value: queryObj[queryParam] };
+  });

@@ -1,44 +1,54 @@
-import React, { useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
+import queryString from "query-string";
+import omit from "lodash/omit";
 
+import { setQueryString } from "../utils";
 import { STATUS_OPTIONS } from "../constants";
 
-const initialState = {
-    name: "",
-    status: "",
-  };
+const reducer = (state, action) => {
+  const { field, value } = action;
+  // removes empty values
+  if (value === "") {
+    return omit(state, [field]);
+  }
+  return { ...state, [field]: value };
+};
 
-  const reducer = (state, action) => {
-    const { field, value } = action;
-    return { ...state, [field]: value };
-  };
+const FilterSection = ({ initialFilters, onSubmit }) => {
+  const [filters, dispatch] = useReducer(reducer, initialFilters);
 
-const FilterSection = ({ onSubmit }) => {
-  const [filters, dispatch ] = useReducer(reducer, initialState);
+  useEffect(() => {
+	  initialFilters.forEach(filter => dispatch(filter))
+  }, [initialFilters]);
 
   const handleOnChange = (e) => {
-	const {name, value} = e.target;
-	dispatch({field: name, value});
-}
+    const { name, value } = e.target;
+    dispatch({ field: name, value });
+  };
 
   const handleOnSubmit = (event) => {
     event.preventDefault();
-	const filtersObj = Object.keys(filters).map((field) => {
-		return { field, value: filters[field] }
-	})
-	onSubmit(filtersObj)
+    const filtersObj = Object.keys(filters).map((field) => {
+      return { field, value: filters[field] };
+    });
+
+    const queryParams = queryString.stringify(filters);
+
+    setQueryString(queryParams);
+
+    onSubmit(filtersObj);
   };
 
   const handleSelect = (e) => {
     const { name, value } = e.target;
     dispatch({ field: name, value });
-    // onSelect([{ field: "status", value: e.target.value }]);
   };
 
   const statusFilter = (
     <select
       id="inputStatus"
       name="status"
-      defaultValue=""
+      value={filters.status}
       className="form-select"
       onChange={handleSelect}
     >
@@ -68,7 +78,8 @@ const FilterSection = ({ onSubmit }) => {
             className="form-control"
             id="inputName"
             name="name"
-			onChange={handleOnChange}
+            value={filters.name}
+            onChange={handleOnChange}
           ></input>
         </div>
       </div>

@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import "bootstrap/dist/css/bootstrap.css";
+import queryString from "query-string";
 
 import Table from "./components/Table";
 import "./App.scss";
-import { parseResponse, sortCandidatesBy, filterCandidates } from "./utils";
+import {
+  parseResponse,
+  sortCandidatesBy,
+  filterCandidates,
+  parseQueryStringObject,
+} from "./utils";
 import FilterSection from "./components/FilterSection";
 
 const App = () => {
@@ -27,12 +33,31 @@ const App = () => {
         const parsedResponse = parseResponse(response.data);
         setCandidates(parsedResponse);
         setFilteredCandidates(parsedResponse);
+        const qs = window.location.search;
+        const queryStringObj = queryString.parse(qs);
+
+        const newFilters = parseQueryStringObject(queryStringObj);
+
+        if (newFilters) {
+          setFilters(newFilters);
+        }
         setIsLoading(false);
       })
       .catch((err) => {
         console.log("Error: ", err);
         setIsError(true);
       });
+  }, []);
+
+  useEffect(() => {
+    const qs = window.location.search;
+    const queryStringObj = queryString.parse(qs);
+
+    const newFilters = parseQueryStringObject(queryStringObj);
+
+    if (newFilters) {
+      setFilters(newFilters);
+    }
   }, []);
 
   useEffect(() => {
@@ -64,7 +89,7 @@ const App = () => {
           <h1>Applications</h1>
         </div>
       </div>
-      <FilterSection onSubmit={setFilters} />
+      <FilterSection onSubmit={setFilters} initialFilters={filters} />
       {isLoading ? (
         <div className="spinner-border" role="status">
           <span className="visually-hidden">Loading...</span>
