@@ -9,6 +9,7 @@ import {
   DATE_TYPE,
   STATUS_COLUMN,
   NAME_COLUMN,
+  POSITION_APPLIED_COLUMN,
 } from "./constants";
 
 export const keysToCamel = function (o) {
@@ -116,6 +117,10 @@ export const filterCandidates = (candidates, filters) => {
             );
           return matchingParts.length > 0;
         });
+      } else if (filter.field === POSITION_APPLIED_COLUMN) {
+        filteredCandidates = filteredCandidates.filter(
+          (candidate) => candidate.positionApplied === filter.value
+        );
       }
     }
   });
@@ -123,10 +128,10 @@ export const filterCandidates = (candidates, filters) => {
 };
 
 export const setQueryString = (queryParams) => {
-	let newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
-	if (queryParams) {
-		newUrl = `${newUrl}?${queryParams}`;
-	}
+  let newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+  if (queryParams) {
+    newUrl = `${newUrl}?${queryParams}`;
+  }
 
   window.history.pushState({ path: newUrl }, "", newUrl);
 };

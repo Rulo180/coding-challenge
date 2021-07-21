@@ -3,7 +3,7 @@ import queryString from "query-string";
 import omit from "lodash/omit";
 
 import { setQueryString } from "../utils";
-import { STATUS_OPTIONS } from "../constants";
+import { POSITION_OPTIONS, STATUS_OPTIONS } from "../constants";
 
 import "./FilterSection.scss";
 
@@ -62,6 +62,22 @@ const FilterSection = ({ initialFilters, onSubmit }) => {
     </select>
   );
 
+  const positionFilter = (
+    <select
+      id="inputPosition"
+      name="positionApplied"
+      value={filters.positionApplied}
+      className="form-select"
+      onChange={handleSelect}
+    >
+      {POSITION_OPTIONS.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  );
+
   return (
     <div className="filters">
       <form onSubmit={handleOnSubmit}>
@@ -85,7 +101,12 @@ const FilterSection = ({ initialFilters, onSubmit }) => {
             </label>
             {statusFilter}
           </div>
-		  <div className="col col-3"></div>
+		  <div className="col col-3 filters_filter">
+            <label htmlFor="inputPosition" className="form-label">
+              Position Applied
+            </label>
+            {positionFilter}
+          </div>
           <div className="col-3 text-end">
             <button type="submit" className="btn btn-primary filters__button">
               Filter
