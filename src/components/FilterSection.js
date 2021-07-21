@@ -5,6 +5,8 @@ import omit from "lodash/omit";
 import { setQueryString } from "../utils";
 import { STATUS_OPTIONS } from "../constants";
 
+import "./FilterSection.scss";
+
 const reducer = (state, action) => {
   const { field, value } = action;
   // removes empty values
@@ -18,7 +20,7 @@ const FilterSection = ({ initialFilters, onSubmit }) => {
   const [filters, dispatch] = useReducer(reducer, initialFilters);
 
   useEffect(() => {
-	  initialFilters.forEach(filter => dispatch(filter))
+    initialFilters.forEach((filter) => dispatch(filter));
   }, [initialFilters]);
 
   const handleOnChange = (e) => {
@@ -61,36 +63,37 @@ const FilterSection = ({ initialFilters, onSubmit }) => {
   );
 
   return (
-    <form onSubmit={handleOnSubmit}>
-      <div className="row">
-        <div className="col col-4">
-          <label htmlFor="inputStatus" className="form-label">
-            Status
-          </label>
-          {statusFilter}
+    <div className="filters">
+      <form onSubmit={handleOnSubmit}>
+        <div className="row align-items-end">
+          <div className="col col-3 filters_filter">
+            <label htmlFor="inputName" className="form-label">
+              Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="inputName"
+              name="name"
+              value={filters.name?filters.name:''}
+              onChange={handleOnChange}
+            ></input>
+          </div>
+          <div className="col col-3 filters_filter">
+            <label htmlFor="inputStatus" className="form-label">
+              Status
+            </label>
+            {statusFilter}
+          </div>
+		  <div className="col col-3"></div>
+          <div className="col-3 text-end">
+            <button type="submit" className="btn btn-primary filters__button">
+              Filter
+            </button>
+          </div>
         </div>
-        <div className="col col-4">
-          <label htmlFor="inputName" className="form-label">
-            Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="inputName"
-            name="name"
-            value={filters.name}
-            onChange={handleOnChange}
-          ></input>
-        </div>
-      </div>
-      <div className="row">
-        <div className="col-12">
-          <button type="submit" className="btn btn-primary">
-            Filter
-          </button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
