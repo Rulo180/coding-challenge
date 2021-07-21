@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import classNames from "classnames";
+import isEmpty from "lodash/isEmpty";
 
 import { getAge } from "../utils";
-import "./Table.scss";
 import { CANDIDATES_COLUMNS } from "../constants";
+import SearchImage from "../images/search-image.svg";
+
+import "./Table.scss";
 
 const Table = ({ data, onSort }) => {
   const rows = Object.values(data).map((candidate) => {
@@ -57,7 +60,28 @@ const Table = ({ data, onSort }) => {
       <thead>
         <tr>{tableHeaders}</tr>
       </thead>
-      <tbody>{rows}</tbody>
+      {isEmpty(data) ? (
+        <tr>
+          <td colSpan="7">
+            <div className="empty-state">
+              <div className="row justify-content-center pt-5 pb-5">
+                <div className="col-6">
+                  <div className="empty-state__icon">
+                    <img width="50" src={SearchImage} alt="Search icon" />
+                  </div>
+                  <h3 className="empty-state__title">No results found</h3>
+                  <p className="empty-state__description">
+                    It seems there are no candidates who match all the criteria.
+                    Try adjusting your filters to find what you are looking for.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      ) : (
+        <tbody>{rows}</tbody>
+      )}
     </table>
   );
 };
