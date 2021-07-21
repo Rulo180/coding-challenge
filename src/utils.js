@@ -70,7 +70,7 @@ export const sortDateValue = (a, b) => {
   return sortNumber(dateA, dateB);
 };
 
-export const sortCandidatesBy = (candidates, sortColumn) => {
+export const sortCandidatesBy = (candidates, sortColumn, isSortAscending) => {
   const columnData = CANDIDATES_COLUMNS[sortColumn];
   if (columnData.isSortable) {
     const columnValues = candidates.map((candidate) => {
@@ -84,6 +84,10 @@ export const sortCandidatesBy = (candidates, sortColumn) => {
       sortedColumns = columnValues.sort(sortTextValue);
     } else if (columnData.type === DATE_TYPE) {
       sortedColumns = columnValues.sort(sortDateValue);
+    }
+
+    if (isSortAscending) {
+      sortedColumns.reverse();
     }
 
     const sortedCandidates = sortedColumns.map((column) =>
@@ -119,7 +123,10 @@ export const filterCandidates = (candidates, filters) => {
 };
 
 export const setQueryString = (queryParams) => {
-  const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${queryParams}`;
+	let newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+	if (queryParams) {
+		newUrl = `${newUrl}?${queryParams}`;
+	}
 
   window.history.pushState({ path: newUrl }, "", newUrl);
 };

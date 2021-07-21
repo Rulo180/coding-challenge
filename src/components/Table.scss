@@ -1,7 +1,7 @@
 .table__theader {
   &--sortable {
     cursor: pointer;
-    ::after {
+    &::after {
       display: inline-block;
       margin-left: 0.255em;
       vertical-align: 0.255em;

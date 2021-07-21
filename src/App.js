@@ -18,6 +18,7 @@ const App = () => {
   const [filteredCandidates, setFilteredCandidates] = useState([]);
   const [filters, setFilters] = useState([]);
   const [sortColumn, setSortColumn] = useState("");
+  const [isSortAscending, setIsSortAscending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
@@ -71,20 +72,34 @@ const App = () => {
   if (isError) {
     return (
       <div className="alert alert-danger" role="alert">
-        An error has ocurred!
+        An error has ocurred!{" "}
+        <a href="javascript:history.go(0)">Click here to refresh the page</a>
       </div>
     );
   }
 
-  const handleSort = (sortColumn) => {
-    const sortedCandidates = sortCandidatesBy(filteredCandidates, sortColumn);
+  const handleSort = (column) => {
+    let newSorting = isSortAscending;
+    if (column !== sortColumn) {
+      newSorting = false;
+    } else {
+      newSorting = !isSortAscending;
+    }
+    setIsSortAscending(newSorting);
+
+    const sortedCandidates = sortCandidatesBy(
+      filteredCandidates,
+      column,
+      newSorting
+    );
+
     setFilteredCandidates(sortedCandidates);
-    setSortColumn(sortColumn);
+    setSortColumn(column);
   };
 
   return (
-    <div className="container-fluid">
-      <div className="row">
+    <div className="container">
+      <div className="row mt-2 mb-4">
         <div className="col">
           <h1>Applications</h1>
         </div>
