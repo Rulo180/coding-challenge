@@ -7,4 +7,5 @@ module.exports = {
         '\\.(css|scss)$': 'identity-obj-proxy',
     },
     testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
+	setupFilesAfterEnv: ['<rootDir>/config/jest/setup.js'],
 }

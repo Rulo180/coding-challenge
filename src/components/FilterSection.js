@@ -50,9 +50,10 @@ const FilterSection = ({ initialFilters, onSubmit }) => {
     <select
       id="inputStatus"
       name="status"
-      value={filters.status}
+      value={filters.status?filters.status:''}
       className="form-select"
       onChange={handleSelect}
+	  data-testid="filterInput"
     >
       {STATUS_OPTIONS.map((option) => (
         <option key={option.value} value={option.value}>
@@ -66,9 +67,10 @@ const FilterSection = ({ initialFilters, onSubmit }) => {
     <select
       id="inputPosition"
       name="positionApplied"
-      value={filters.positionApplied}
+      value={filters.positionApplied?filters.positionApplied:''}
       className="form-select"
       onChange={handleSelect}
+	  data-testid="filterInput"
     >
       {POSITION_OPTIONS.map((option) => (
         <option key={option.value} value={option.value}>
@@ -91,6 +93,7 @@ const FilterSection = ({ initialFilters, onSubmit }) => {
               className="form-control"
               id="inputName"
               name="name"
+			  data-testid="filterInput"
               value={filters.name?filters.name:''}
               onChange={handleOnChange}
             ></input>
@@ -108,7 +111,7 @@ const FilterSection = ({ initialFilters, onSubmit }) => {
             {positionFilter}
           </div>
           <div className="col-3 text-end">
-            <button type="submit" className="btn btn-primary filters__button">
+            <button type="submit" className="btn btn-primary filters__button" data-testid="filterButton">
               Filter
             </button>
           </div>
