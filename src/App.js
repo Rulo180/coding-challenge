@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import "bootstrap/dist/css/bootstrap.css";
 import queryString from "query-string";
@@ -7,21 +7,27 @@ import Table from "./components/Table";
 import "./App.scss";
 import {
   parseResponse,
-  sortCandidatesBy,
-  filterCandidates,
+  filterAndSortCandidates,
   parseQueryStringObject,
 } from "./utils";
 import FilterSection from "./components/FilterSection";
 
+
 const App = () => {
   const [candidates, setCandidates] = useState([]);
-  const [filteredCandidates, setFilteredCandidates] = useState([]);
   const [filters, setFilters] = useState([]);
   const [sortColumn, setSortColumn] = useState("");
   const [isSortAscending, setIsSortAscending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
+  const filteredCandidates = useMemo(
+    () =>
+      filterAndSortCandidates({candidates, filters, sortColumn, isSortAscending}),
+    [candidates, filters, sortColumn, isSortAscending]
+  );
+
+  // Fetch candidates on first render
   useEffect(() => {
     fetch("https://personio-fe-test.herokuapp.com/api/v1/candidates", {
       method: "GET",
@@ -33,7 +39,6 @@ const App = () => {
       .then((response) => {
         const parsedResponse = parseResponse(response.data);
         setCandidates(parsedResponse);
-        setFilteredCandidates(parsedResponse);
         const qs = window.location.search;
         const queryStringObj = queryString.parse(qs);
 
@@ -50,6 +55,7 @@ const App = () => {
       });
   }, []);
 
+  // Set the filters based on the url params
   useEffect(() => {
     const qs = window.location.search;
     const queryStringObj = queryString.parse(qs);
@@ -60,14 +66,6 @@ const App = () => {
       setFilters(newFilters);
     }
   }, []);
-
-  useEffect(() => {
-    let filteredCandidates = filterCandidates(candidates, filters);
-    if (sortColumn) {
-      filteredCandidates = sortCandidatesBy(filteredCandidates, sortColumn);
-    }
-    setFilteredCandidates(filteredCandidates);
-  }, [filters]);
 
   if (isError) {
     return (
@@ -87,13 +85,6 @@ const App = () => {
     }
     setIsSortAscending(newSorting);
 
-    const sortedCandidates = sortCandidatesBy(
-      filteredCandidates,
-      column,
-      newSorting
-    );
-
-    setFilteredCandidates(sortedCandidates);
     setSortColumn(column);
   };
 

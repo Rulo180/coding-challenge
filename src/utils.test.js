@@ -5,7 +5,55 @@ import {
   sortTextValue,
   sortDateValue,
   filterCandidates,
+  filterAndSortCandidates,
 } from "./utils";
+
+const createFilter = (field, value) => ({ field, value });
+
+const getCandidates = () => {
+  return [
+    {
+      id: 1,
+      name: "Martin Valles",
+      email: "martin@gmail.com",
+      age: 31,
+      positionApplied: "Developer",
+      yearOfExperience: 4,
+      status: "Accepted",
+      applicationDate: "01/01/2021",
+    },
+    {
+      id: 2,
+      name: "Maria Fernandez",
+      email: "maria@gmail.com",
+      age: 28,
+      positionApplied: "Administrator",
+      yearOfExperience: 6,
+      status: "Waiting",
+      applicationDate: "01/02/2021",
+    },
+    {
+      id: 3,
+      name: "Sergio Ortiz",
+      email: "sergio@gmail.com",
+      age: 24,
+      positionApplied: "Developer",
+      yearOfExperience: 1,
+      status: "Rejected",
+      applicationDate: "01/06/2021",
+    },
+    {
+      id: 4,
+      name: "Leonardo Martinez",
+      email: "leonardo@gmail.com",
+      age: 29,
+      positionApplied: "Manager",
+      yearOfExperience: 5,
+      status: "Accepted",
+      applicationDate: "01/03/2021",
+    },
+  ];
+};
 
 describe("Utils", () => {
   describe("keysToCamel", () => {
@@ -117,16 +165,6 @@ describe("Utils", () => {
   });
 
   describe("filterCandidates", () => {
-    const candidates = [
-      { name: "Martin Valles", status: "Accepted", email: "martin@gmail.com" },
-      { name: "Maria Fernandez", status: "Waiting", email: "maria@gmail.com" },
-      { name: "Sergio Ortiz", status: "Rejected", email: "sergio@gmail.com" },
-      {
-        name: "Leonardo Martinez",
-        status: "Accepted",
-        email: "leonardo@gmail.com",
-      },
-    ];
     it("should filter candidates by status", () => {
       const filters = [
         { field: "name", value: "" },
@@ -134,16 +172,27 @@ describe("Utils", () => {
       ];
       const expected = [
         {
+          id: 1,
           name: "Martin Valles",
-          status: "Accepted",
           email: "martin@gmail.com",
+          age: 31,
+          positionApplied: "Developer",
+          yearOfExperience: 4,
+          status: "Accepted",
+          applicationDate: "01/01/2021",
         },
         {
+          id: 4,
           name: "Leonardo Martinez",
-          status: "Accepted",
           email: "leonardo@gmail.com",
+          age: 29,
+          positionApplied: "Manager",
+          yearOfExperience: 5,
+          status: "Accepted",
+          applicationDate: "01/03/2021",
         },
       ];
+      const candidates = getCandidates();
       const result = filterCandidates(candidates, filters);
       expect(result).toEqual(expected);
     });
@@ -155,21 +204,37 @@ describe("Utils", () => {
       ];
       const expected = [
         {
+          id: 1,
           name: "Martin Valles",
-          status: "Accepted",
           email: "martin@gmail.com",
-        },
-        {
-          name: "Maria Fernandez",
-          status: "Waiting",
-          email: "maria@gmail.com",
-        },
-        {
-          name: "Leonardo Martinez",
+          age: 31,
+          positionApplied: "Developer",
+          yearOfExperience: 4,
           status: "Accepted",
+          applicationDate: "01/01/2021",
+        },
+        {
+          id: 2,
+          name: "Maria Fernandez",
+          email: "maria@gmail.com",
+          age: 28,
+          positionApplied: "Administrator",
+          yearOfExperience: 6,
+          status: "Waiting",
+          applicationDate: "01/02/2021",
+        },
+        {
+          id: 4,
+          name: "Leonardo Martinez",
           email: "leonardo@gmail.com",
+          age: 29,
+          positionApplied: "Manager",
+          yearOfExperience: 5,
+          status: "Accepted",
+          applicationDate: "01/03/2021",
         },
       ];
+      const candidates = getCandidates();
       const result = filterCandidates(candidates, filters);
       expect(result).toEqual(expected);
     });
@@ -181,17 +246,220 @@ describe("Utils", () => {
       ];
       const expected = [
         {
+          id: 1,
           name: "Martin Valles",
-          status: "Accepted",
           email: "martin@gmail.com",
+          age: 31,
+          positionApplied: "Developer",
+          yearOfExperience: 4,
+          status: "Accepted",
+          applicationDate: "01/01/2021",
         },
         {
+          id: 4,
           name: "Leonardo Martinez",
-          status: "Accepted",
           email: "leonardo@gmail.com",
+          age: 29,
+          positionApplied: "Manager",
+          yearOfExperience: 5,
+          status: "Accepted",
+          applicationDate: "01/03/2021",
         },
       ];
+      const candidates = getCandidates();
       const result = filterCandidates(candidates, filters);
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe("filterAndSortCandidates", () => {
+    it("should return same candidates if no filters are passed", () => {
+      const candidates = getCandidates();
+      const result = filterAndSortCandidates({
+        candidates,
+        filters: [],
+        sortColumn: "name",
+        isSortAscending: true,
+      });
+      expect(result).toEqual(candidates);
+    });
+
+    it("should return an empty array if no candidates are provided", () => {
+      const nameFilter = createFilter("name", "Martin");
+      const filters = [nameFilter];
+      const result = filterAndSortCandidates({
+        candidates: [],
+        filters,
+        sortColumn: "name",
+        isSortAscending: true,
+      });
+      expect(result).toEqual([]);
+    });
+
+    it("should not apply sorting if no sortingColumn is provided", () => {
+      const candidates = getCandidates();
+      const expected = candidates;
+      const result = filterAndSortCandidates({
+        candidates,
+        filters: [],
+        sortColumn: undefined,
+        isSortAscending: false,
+      });
+      expect(result).toEqual(expected);
+    });
+
+    it("should not apply sorting for non-sortable columns", () => {
+      const candidates = getCandidates();
+      const nonSortableColumn = "name";
+      const expected = candidates;
+      const result = filterAndSortCandidates({
+        candidates,
+        filters: [],
+        sortColumn: nonSortableColumn,
+        isSortAscending: false,
+      });
+      expect(result).toEqual(expected);
+    });
+
+    it("should apply filters to candidates", () => {
+      const nameFilter = createFilter("name", "Martin");
+      const filters = [nameFilter];
+      const candidates = getCandidates();
+      const expected = [
+        {
+          id: 1,
+          name: "Martin Valles",
+          email: "martin@gmail.com",
+          age: 31,
+          positionApplied: "Developer",
+          yearOfExperience: 4,
+          status: "Accepted",
+          applicationDate: "01/01/2021",
+        },
+        {
+          id: 4,
+          name: "Leonardo Martinez",
+          email: "leonardo@gmail.com",
+          age: 29,
+          positionApplied: "Manager",
+          yearOfExperience: 5,
+          status: "Accepted",
+          applicationDate: "01/03/2021",
+        },
+      ];
+      const result = filterAndSortCandidates({
+        candidates,
+        filters,
+        sortColumn: undefined,
+        isSortAscending: true,
+      });
+      expect(result).toEqual(expected);
+    });
+    it("should apply descending sorting to candidates when sortColumn is provided", () => {
+      const candidates = getCandidates();
+      const expected = [
+        {
+          id: 3,
+          name: "Sergio Ortiz",
+          email: "sergio@gmail.com",
+          age: 24,
+          positionApplied: "Developer",
+          yearOfExperience: 1,
+          status: "Rejected",
+          applicationDate: "01/06/2021",
+        },
+        {
+          id: 1,
+          name: "Martin Valles",
+          email: "martin@gmail.com",
+          age: 31,
+          positionApplied: "Developer",
+          yearOfExperience: 4,
+          status: "Accepted",
+          applicationDate: "01/01/2021",
+        },
+        {
+          id: 4,
+          name: "Leonardo Martinez",
+          email: "leonardo@gmail.com",
+          age: 29,
+          positionApplied: "Manager",
+          yearOfExperience: 5,
+          status: "Accepted",
+          applicationDate: "01/03/2021",
+        },
+        {
+          id: 2,
+          name: "Maria Fernandez",
+          email: "maria@gmail.com",
+          age: 28,
+          positionApplied: "Administrator",
+          yearOfExperience: 6,
+          status: "Waiting",
+          applicationDate: "01/02/2021",
+        },
+      ];
+      const isSortAscending = false;
+      const result = filterAndSortCandidates({
+        candidates,
+        filters: [],
+        sortColumn: "yearOfExperience",
+        isSortAscending,
+      });
+      expect(result).toEqual(expected);
+    });
+
+    it("should apply ascending sorting to candidates when sortColumn and isSortAscending are provided", () => {
+      const candidates = getCandidates();
+      const expected = [
+        {
+          id: 2,
+          name: "Maria Fernandez",
+          email: "maria@gmail.com",
+          age: 28,
+          positionApplied: "Administrator",
+          yearOfExperience: 6,
+          status: "Waiting",
+          applicationDate: "01/02/2021",
+        },
+        {
+          id: 4,
+          name: "Leonardo Martinez",
+          email: "leonardo@gmail.com",
+          age: 29,
+          positionApplied: "Manager",
+          yearOfExperience: 5,
+          status: "Accepted",
+          applicationDate: "01/03/2021",
+        },
+        {
+          id: 1,
+          name: "Martin Valles",
+          email: "martin@gmail.com",
+          age: 31,
+          positionApplied: "Developer",
+          yearOfExperience: 4,
+          status: "Accepted",
+          applicationDate: "01/01/2021",
+        },
+        {
+          id: 3,
+          name: "Sergio Ortiz",
+          email: "sergio@gmail.com",
+          age: 24,
+          positionApplied: "Developer",
+          yearOfExperience: 1,
+          status: "Rejected",
+          applicationDate: "01/06/2021",
+        },
+      ];
+      const isSortAscending = true;
+      const result = filterAndSortCandidates({
+        candidates,
+        filters: [],
+        sortColumn: "yearOfExperience",
+        isSortAscending,
+      });
       expect(result).toEqual(expected);
     });
   });

@@ -71,9 +71,13 @@ export const sortDateValue = (a, b) => {
   return sortNumber(dateA, dateB);
 };
 
-export const sortCandidatesBy = (candidates, sortColumn, isSortAscending) => {
+export const sortCandidatesBy = ({
+  candidates,
+  sortColumn,
+  isSortAscending = false,
+}) => {
   const columnData = CANDIDATES_COLUMNS[sortColumn];
-  if (columnData.isSortable) {
+  if (columnData?.isSortable) {
     const columnValues = candidates.map((candidate) => {
       return { id: candidate.id, value: candidate[sortColumn] };
     });
@@ -124,6 +128,23 @@ export const filterCandidates = (candidates, filters) => {
       }
     }
   });
+  return filteredCandidates;
+};
+
+export const filterAndSortCandidates = ({
+  candidates,
+  filters,
+  sortColumn,
+  isSortAscending = false,
+}) => {
+  let filteredCandidates = filterCandidates(candidates, filters);
+  if (sortColumn) {
+    filteredCandidates = sortCandidatesBy({
+      candidates: filteredCandidates,
+      sortColumn,
+      isSortAscending,
+    });
+  }
   return filteredCandidates;
 };
 
