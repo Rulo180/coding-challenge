@@ -7,27 +7,19 @@ import { CANDIDATES_COLUMNS } from "../constants";
 import SearchImage from "../images/search-image.svg";
 
 import "./Table.scss";
+import EmptyState from "./EmptyState";
 
 const Table = ({ data, onSort }) => {
   if (isEmpty(data)) {
     return (
-      <div className="empty-state">
-        <div className="row justify-content-center pt-5 pb-5">
-          <div className="col-6">
-            <div className="empty-state__icon">
-              <img width="50" src={SearchImage} alt="Search icon" />
-            </div>
-            <h3 className="empty-state__title">No results found</h3>
-            <p className="empty-state__description">
-              It seems there are no candidates who match all the criteria. Try
-              adjusting your filters to find what you are looking for.
-            </p>
-          </div>
-        </div>
-      </div>
+      <EmptyState
+        title="No results found"
+        description="It seems there are no candidates who match all the criteria. Try adjusting your filters to find what you are looking for."
+		image={SearchImage}
+      />
     );
   }
-  
+
   const rows = Object.values(data).map((candidate) => {
     const {
       id,

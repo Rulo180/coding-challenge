@@ -2,13 +2,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 
-import Table from "../components/Table";
-import FilterSection from "../components/FilterSection";
 import {
   parseResponse,
   filterAndSortCandidates,
   parseQueryStringObject,
 } from "../utils";
+import Table from "../components/Table";
+import FilterSection from "../components/FilterSection";
+import Spinner from "../components/Spinner";
+import ErrorState from "../components/ErrorState";
 
 const ApplicationsPage = (props) => {
   const [candidates, setCandidates] = useState([]);
@@ -16,7 +18,7 @@ const ApplicationsPage = (props) => {
   const [isSortAscending, setIsSortAscending] = useState(false);
   const [filters, setFilters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState(false);
   const location = useLocation();
 
   // Fetch candidates on first render
@@ -43,7 +45,7 @@ const ApplicationsPage = (props) => {
       })
       .catch((err) => {
         console.log("Error: ", err);
-        setIsError(true);
+        setError(true);
       });
   }, []);
 
@@ -81,12 +83,9 @@ const ApplicationsPage = (props) => {
     setSortColumn(column);
   };
 
-  if (isError) {
+  if (error) {
     return (
-      <div className="alert alert-danger" role="alert">
-        An error has ocurred!{" "}
-        <a href="javascript:history.go(0)">Click here to refresh the page</a>
-      </div>
+      <ErrorState />
     );
   }
 
@@ -105,9 +104,7 @@ const ApplicationsPage = (props) => {
       </div>
       <FilterSection onSubmit={handleOnSubmit} initialFilters={filters} />
       {isLoading ? (
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+        <Spinner />
       ) : (
         <Table data={filteredCandidates} onSort={handleSort} />
       )}
