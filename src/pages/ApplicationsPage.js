@@ -23,30 +23,28 @@ const ApplicationsPage = (props) => {
 
   // Fetch candidates on first render
   useEffect(() => {
-    fetch("https://personio-fe-test.herokuapp.com/api/v1/candidates", {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        const parsedResponse = parseResponse(response.data);
+    async function fetchCandidates() {
+      try {
+        const response = await fetch(
+          "https://personio-fe-test.herokuapp.com/api/v1/candidates",
+          {
+            method: "GET",
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+		const data = await response.json();
+		const parsedResponse = parseResponse(data.data);
         setCandidates(parsedResponse);
-        const qs = window.location.search;
-        const queryStringObj = queryString.parse(qs);
-
-        const newFilters = parseQueryStringObject(queryStringObj);
-
-        if (newFilters) {
-          setFilters(newFilters);
-        }
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.log("Error: ", err);
-        setError(true);
-      });
+      } catch (error) {
+		setError(true);
+      } finally {
+		  setIsLoading(false);
+      }
+    }
+	setIsLoading(true);
+	fetchCandidates()
   }, []);
 
   // Set the filters based on the url params
@@ -84,9 +82,7 @@ const ApplicationsPage = (props) => {
   };
 
   if (error) {
-    return (
-      <ErrorState />
-    );
+    return <ErrorState />;
   }
 
   const handleOnSubmit = (filters) => {
