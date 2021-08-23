@@ -1,8 +1,6 @@
 import React, { useEffect, useReducer } from "react";
-import queryString from "query-string";
 import omit from "lodash/omit";
 
-import { setQueryString } from "../utils";
 import { POSITION_OPTIONS, STATUS_OPTIONS } from "../constants";
 
 import "./FilterSection.scss";
@@ -30,15 +28,7 @@ const FilterSection = ({ initialFilters, onSubmit }) => {
 
   const handleOnSubmit = (event) => {
     event.preventDefault();
-    const filtersObj = Object.keys(filters).map((field) => {
-      return { field, value: filters[field] };
-    });
-
-    const queryParams = queryString.stringify(filters);
-
-    setQueryString(queryParams);
-
-    onSubmit(filtersObj);
+    onSubmit(filters);
   };
 
   const handleSelect = (e) => {

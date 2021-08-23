@@ -148,15 +148,6 @@ export const filterAndSortCandidates = ({
   return filteredCandidates;
 };
 
-export const setQueryString = (queryParams) => {
-  let newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
-  if (queryParams) {
-    newUrl = `${newUrl}?${queryParams}`;
-  }
-
-  window.history.pushState({ path: newUrl }, "", newUrl);
-};
-
 export const parseQueryStringObject = (queryObj) =>
   Object.keys(queryObj).map((queryParam) => {
     return { field: queryParam, value: queryObj[queryParam] };
